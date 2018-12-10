@@ -122,7 +122,7 @@ public class MessageBusImpl implements MessageBus {
 		}
 
 	}
-	//TODO: look for last case problem sender5
+	//TODO: look for last case problem sender5 hand1 doesnt do shit hand2 works good
 	@Override
 	public void unregister(MicroService m) {
 		// TODO: synchronize?
