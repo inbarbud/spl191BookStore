@@ -1,7 +1,7 @@
 package bgu.spl.mics.application.passiveObjects;
 
 import bgu.spl.mics.Future;
-import com.sun.java.util.jar.pack.Package;
+//import com.sun.java.util.jar.pack.Package;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -61,7 +61,7 @@ public class InventoryTest {
         int price= i.checkAvailabiltyAndGetPrice("");
         assertEquals(-1,price);
         BookInventoryInfo[ ] inv = new BookInventoryInfo[1];
-        inv[0]= new BookInventoryInfo("a",2,30));
+        inv[0]= new BookInventoryInfo("a",2,30);
         i.load(inv);
         price=i.checkAvailabiltyAndGetPrice(inv[0].getBookTitle());
         assertEquals(price,inv[0].getPrice());

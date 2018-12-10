@@ -1,10 +1,10 @@
 package bgu.spl.mics;
 
 
-import jdk.vm.ci.code.site.Call;
+//import jdk.vm.ci.code.site.Call;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingQueue;
+//import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * The MicroService is an abstract class that any micro-service in the system
@@ -159,13 +159,14 @@ public abstract class MicroService implements Runnable {
      */
     @Override
     public final void run() {
+        //terminated=false;
         MessageBusImpl.getInstance().register(this);
         initialize();
-
+        int i=0;
         while (!terminated) {
             try {
                 Message m = MessageBusImpl.getInstance().awaitMessage(this);
-                callbackList.get(m).call(m);
+                callbackList.get(m.getClass()).call(m);
             }
             catch (InterruptedException e){}
 

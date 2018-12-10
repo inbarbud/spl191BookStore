@@ -14,6 +14,9 @@ package bgu.spl.mics.application.passiveObjects;
  */
 public class Inventory {
 
+
+
+
 	/**
      * Retrieves the single instance of this class.
      */

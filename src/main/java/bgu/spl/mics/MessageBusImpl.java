@@ -50,6 +50,7 @@ public class MessageBusImpl implements MessageBus {
 			catch ( InterruptedException e){}
 			eventList.put(type, q);
 		}
+		int k=0;
 	}
 
 	@Override
@@ -61,14 +62,14 @@ public class MessageBusImpl implements MessageBus {
 				}
 				catch ( InterruptedException e){}
 			}
-			else {
-				LinkedBlockingQueue<MicroService> q = new LinkedBlockingQueue<>();
-				try {
-					q.put(m);
-				}
-				catch (InterruptedException e){}
-				broadcastList.put(type, q);
+		}
+		else{
+			LinkedBlockingQueue<MicroService> q = new LinkedBlockingQueue<>();
+			try {
+				q.put(m);
 			}
+			catch (InterruptedException e){}
+			broadcastList.put(type, q);
 		}
 	}
 
@@ -81,7 +82,7 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public void sendBroadcast(Broadcast b) {
-
+		int k=0;
     	for(int i=0;i<broadcastList.get(b.getClass()).size();i++) {
 			try {
 				MicroService m = broadcastList.get(b.getClass()).take();           //dequeue microService
@@ -96,17 +97,20 @@ public class MessageBusImpl implements MessageBus {
 	
 	@Override
 	public <T> Future<T> sendEvent(Event<T> e) {
+		Future<T> f= new Future<>();
+		futureList.put(e,f);
 		try {
-			MicroService m= eventList.get(e.getClass()).take();			//dequeue microService
+			if(eventList.isEmpty())
+				return null;//TODO: delete future
+			MicroService m= eventList.get(e.getClass()).poll();			//dequeue microService
 			if (m==null)										//no suitable microService
-				return null;
+				return null;//TODO: delete future
 			serviceList.get(m).put(e);                      //push event to message queue
 			eventList.get(e.getClass()).put(m);                        //enqueue microService
 		}
 		catch (InterruptedException ei){}
 
-		Future<T> f= new Future<>();
-		futureList.put(e,f);
+
 		return f;
 	}
 
@@ -118,7 +122,7 @@ public class MessageBusImpl implements MessageBus {
 		}
 
 	}
-
+	//TODO: look for last case problem sender5
 	@Override
 	public void unregister(MicroService m) {
 		// TODO: synchronize?
