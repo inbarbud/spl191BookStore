@@ -28,7 +28,8 @@ public abstract class MicroService implements Runnable {
 
     private boolean terminated = false;
     private final String name;
-    private ConcurrentHashMap<Class<? extends Message>, Callback<?>> callbacklist = new ConcurrentHashMap<>();
+//    private ConcurrentHashMap<Class<? extends Message>, Callback<?>> callbackList = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Class<? extends Message>, Callback> callbackList = new ConcurrentHashMap<>();
 
     /**
      * @param name the micro-service name (used mainly for debugging purposes -
@@ -60,8 +61,8 @@ public abstract class MicroService implements Runnable {
      *                 queue.
      */
     protected final <T, E extends Event<T>> void subscribeEvent(Class<E> type, Callback<E> callback) {
-        if(!callbacklist.containsKey(type))
-            callbacklist.put(type,callback);
+        if(!callbackList.containsKey(type))
+            callbackList.put(type,callback);
         MessageBusImpl.getInstance().subscribeEvent(type,this);
     }
 
@@ -86,8 +87,8 @@ public abstract class MicroService implements Runnable {
      *                 queue.
      */
     protected final <B extends Broadcast> void subscribeBroadcast(Class<B> type, Callback<B> callback) {
-        if(!callbacklist.containsKey(type))
-            callbacklist.put(type,callback);
+        if(!callbackList.containsKey(type))
+            callbackList.put(type,callback);
         MessageBusImpl.getInstance().subscribeBroadcast(type,this);
     }
 
@@ -162,11 +163,12 @@ public abstract class MicroService implements Runnable {
         initialize();
 
         while (!terminated) {
+            try {
+                Message m = MessageBusImpl.getInstance().awaitMessage(this);
+                callbackList.get(m).call(m);
+            }
+            catch (InterruptedException e){}
 
-            Message m = MessageBusImpl.getInstance().awaitMessage(this);
-
-            Class<? extends Callback<?>> c =callbacklist.get(m).getClass();
-            callbacklist.get(m).call(c);
         }
     }
 
