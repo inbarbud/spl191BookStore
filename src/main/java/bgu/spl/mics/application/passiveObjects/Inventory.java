@@ -18,7 +18,7 @@ public class Inventory {
 	private static Inventory inv=null;
 	private BookInventoryInfo[ ] collection;
 
-	public Inventory(){
+	private Inventory(){
 
 	}
 

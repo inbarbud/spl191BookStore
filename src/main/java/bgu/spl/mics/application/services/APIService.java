@@ -1,6 +1,7 @@
 package bgu.spl.mics.application.services;
 
 import bgu.spl.mics.MicroService;
+import javafx.util.Pair;
 
 /**
  * APIService is in charge of the connection between a client and the store.
@@ -13,9 +14,11 @@ import bgu.spl.mics.MicroService;
  */
 public class APIService extends MicroService{
 
-	public APIService() {
-		super("Change_This_Name");
-		// TODO Implement this
+	private Pair <String,Integer>[] orderSchedule;
+
+	public APIService(Pair <String,Integer>[] orderSchedule) {
+		super("APIService");
+		this.orderSchedule=orderSchedule;
 	}
 
 	@Override

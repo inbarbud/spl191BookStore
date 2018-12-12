@@ -12,13 +12,15 @@ import bgu.spl.mics.Future;
  * You can add ONLY private methods and fields to this class.
  */
 public class ResourcesHolder {
-	
+	private static ResourcesHolder res=null;
+	private DeliveryVehicle[] collection;
 	/**
      * Retrieves the single instance of this class.
      */
 	public static ResourcesHolder getInstance() {
-		//TODO: Implement this
-		return null;
+		if (res == null)
+			res = new ResourcesHolder();
+		return res;
 	}
 	
 	/**
@@ -49,7 +51,7 @@ public class ResourcesHolder {
      * @param vehicles	Array of {@link DeliveryVehicle} instances to store.
      */
 	public void load(DeliveryVehicle[] vehicles) {
-		//TODO: Implement this
+		collection=vehicles;
 	}
 
 }

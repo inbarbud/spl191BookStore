@@ -24,7 +24,7 @@ public class MessageBusImpl implements MessageBus {
 	private ConcurrentHashMap<MicroService, LinkedBlockingQueue<Message>> serviceList = new ConcurrentHashMap<>();
 	private static MessageBusImpl bus = null;
 
-	private  MessageBusImpl()
+	private MessageBusImpl()
 	{
 
 	}
