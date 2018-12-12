@@ -171,6 +171,7 @@ public abstract class MicroService implements Runnable {
             catch (InterruptedException e){}
 
         }
+        MessageBusImpl.getInstance().unregister(this);
     }
 
 }

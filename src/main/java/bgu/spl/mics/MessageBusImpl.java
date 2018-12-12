@@ -15,8 +15,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class MessageBusImpl implements MessageBus {
 
 //    private ConcurrentHashMap<Class<? extends Event<?>>, LinkedBlockingQueue<MicroService>> eventList = new ConcurrentHashMap<>();
-	private ConcurrentHashMap<Class<? extends Event>, LinkedBlockingQueue<MicroService>> eventList = new ConcurrentHashMap<>();
-	private ConcurrentHashMap<Class<? extends Broadcast>, LinkedBlockingQueue<MicroService>> broadcastList = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<Class, LinkedBlockingQueue<MicroService>> eventList = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<Class, LinkedBlockingQueue<MicroService>> broadcastList = new ConcurrentHashMap<>();
 
 //	private ConcurrentHashMap<Event<?>, Future<?>> futureList = new ConcurrentHashMap<>();
 	private ConcurrentHashMap<Event, Future> futureList = new ConcurrentHashMap<>();
@@ -43,7 +43,7 @@ public class MessageBusImpl implements MessageBus {
 
 		}
 		else {
-			LinkedBlockingQueue<MicroService> q = new LinkedBlockingQueue<>();
+			LinkedBlockingQueue<MicroService> q = new LinkedBlockingQueue<>(100);
 			try {
 				q.put(m);
 			}
@@ -64,7 +64,7 @@ public class MessageBusImpl implements MessageBus {
 			}
 		}
 		else{
-			LinkedBlockingQueue<MicroService> q = new LinkedBlockingQueue<>();
+			LinkedBlockingQueue<MicroService> q = new LinkedBlockingQueue<>(100);
 			try {
 				q.put(m);
 			}
@@ -100,12 +100,20 @@ public class MessageBusImpl implements MessageBus {
 		Future<T> f= new Future<>();
 		futureList.put(e,f);
 		try {
-			if(eventList.isEmpty())
-				return null;//TODO: delete future
-			MicroService m= eventList.get(e.getClass()).poll();			//dequeue microService
+			if(eventList.isEmpty()) {
+			    futureList.remove(e);
+                return null;//TODO: delete future
+            }
+			MicroService m= eventList.get(e.getClass()).take();//.poll();			//dequeue microService
 			if (m==null)										//no suitable microService
-				return null;//TODO: delete future
-			serviceList.get(m).put(e);                      //push event to message queue
+            {
+                futureList.remove(e);
+                return null;//TODO: delete future
+            }
+            LinkedBlockingQueue<Message> m2=serviceList.get(m);
+			//m2.add(e);
+            //while(!m2.add(e));
+			serviceList.get(m).put(e);//offer(e);                      //push event to message queue
 			eventList.get(e.getClass()).put(m);                        //enqueue microService
 		}
 		catch (InterruptedException ei){}

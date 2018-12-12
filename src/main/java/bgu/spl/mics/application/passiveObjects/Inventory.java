@@ -15,16 +15,22 @@ package bgu.spl.mics.application.passiveObjects;
 public class Inventory {
 
 
+	private static Inventory inv=null;
+	private BookInventoryInfo[ ] collection;
 
+	public Inventory(){
+
+	}
 
 	/**
      * Retrieves the single instance of this class.
      */
 	public static Inventory getInstance() {
-		//TODO: Implement this
-		return null;
+		if (inv == null)
+			inv = new Inventory();
+		return inv;
 	}
-	
+
 	/**
      * Initializes the store inventory. This method adds all the items given to the store
      * inventory.
@@ -33,7 +39,7 @@ public class Inventory {
      * 						of the inventory.
      */
 	public void load (BookInventoryInfo[ ] inventory ) {
-		
+		collection=inventory;
 	}
 	
 	/**
@@ -45,8 +51,13 @@ public class Inventory {
      * 			second should reduce by one the number of books of the desired type.
      */
 	public OrderResult take (String book) {
-		
-		return null;
+		for (BookInventoryInfo element: collection) {
+			if(element.getBookTitle()==book && element.getAmountInInventory()>0) {
+				element.minusAmountInInventory();
+				return OrderResult.SUCCESSFULLY_TAKEN;
+			}
+		}
+		return OrderResult.NOT_IN_STOCK;
 	}
 	
 	
@@ -58,7 +69,11 @@ public class Inventory {
      * @return the price of the book if it is available, -1 otherwise.
      */
 	public int checkAvailabiltyAndGetPrice(String book) {
-		//TODO: Implement this
+		for (BookInventoryInfo element: collection) {
+			if(element.getBookTitle()==book && element.getAmountInInventory()>0) {
+				return element.getPrice();
+			}
+		}
 		return -1;
 	}
 	
