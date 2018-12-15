@@ -74,6 +74,10 @@ public class Customer {
 	public int getAvailableCreditAmount() {
 		return availableAmountInCreditCard;
 	}
+
+	public void setAvailableAmountInCreditCard(int amountToCharge){
+		availableAmountInCreditCard=availableAmountInCreditCard-amountToCharge;
+	}
 	
 	/**
      * Retrieves this customers credit card serial number.    

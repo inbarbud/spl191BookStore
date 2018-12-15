@@ -12,8 +12,10 @@ import java.util.LinkedList;
  * You can add ONLY private fields and methods to this class as you see fit.
  */
 public class MoneyRegister {
+
 	private static MoneyRegister money=null;
 	private LinkedList<OrderReceipt> list;
+	private int ID=0;
 
 	private MoneyRegister(){
 
@@ -38,6 +40,11 @@ public class MoneyRegister {
 			list.add(r);
 		}
 	}
+
+	public int getReceiptID(){
+		ID++;
+		return ID;
+	}
 	
 	/**
      * Retrieves the current total earnings of the store.  
@@ -56,7 +63,7 @@ public class MoneyRegister {
      * @param amount 	amount to charge
      */
 	public void chargeCreditCard(Customer c, int amount) {
-		// TODO Implement this
+		c.setAvailableAmountInCreditCard(amount);
 	}
 	
 	/**

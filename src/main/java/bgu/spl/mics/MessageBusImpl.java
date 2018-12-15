@@ -50,7 +50,6 @@ public class MessageBusImpl implements MessageBus {
 			catch ( InterruptedException e){}
 			eventList.put(type, q);
 		}
-		int k=0;
 	}
 
 	@Override

@@ -1,6 +1,10 @@
 package bgu.spl.mics.application.passiveObjects;
 
 import bgu.spl.mics.Future;
+import bgu.spl.mics.application.messages.DeliveryEvent;
+import bgu.spl.mics.application.services.ResourceService;
+import java.util.concurrent.LinkedBlockingQueue;
+
 
 /**
  * Passive object representing the resource manager.
@@ -13,7 +17,13 @@ import bgu.spl.mics.Future;
  */
 public class ResourcesHolder {
 	private static ResourcesHolder res=null;
-	private DeliveryVehicle[] collection;
+	private LinkedBlockingQueue<DeliveryVehicle> vehicleQueue;
+	private LinkedBlockingQueue<Future> futureQueue;
+
+
+	public ResourcesHolder(){
+
+	}
 	/**
      * Retrieves the single instance of this class.
      */
@@ -31,8 +41,21 @@ public class ResourcesHolder {
      * 			{@link DeliveryVehicle} when completed.   
      */
 	public Future<DeliveryVehicle> acquireVehicle() {
-		//TODO: Implement this
-		return null;
+		Future<DeliveryVehicle> futureCar= new Future<>();
+		if(!vehicleQueue.isEmpty()){
+			try{
+				DeliveryVehicle car =vehicleQueue.take();
+				futureCar.resolve(car);
+			}
+			catch(InterruptedException ex) {}
+		}
+		else{
+			try{
+				futureQueue.put(futureCar);
+			}
+			catch(InterruptedException ex) {}
+		}
+		return futureCar;
 	}
 	
 	/**
@@ -42,7 +65,19 @@ public class ResourcesHolder {
      * @param vehicle	{@link DeliveryVehicle} to be released.
      */
 	public void releaseVehicle(DeliveryVehicle vehicle) {
-		//TODO: Implement this
+		if(futureQueue.isEmpty()){
+			try{
+				vehicleQueue.put(vehicle);
+			}
+			catch(InterruptedException ex) {}
+		}
+		else {
+			try{
+				Future<DeliveryVehicle> futureCar= futureQueue.take();
+				futureCar.resolve(vehicle);
+			}
+			catch(InterruptedException ex) {}
+		}
 	}
 	
 	/**
@@ -51,7 +86,12 @@ public class ResourcesHolder {
      * @param vehicles	Array of {@link DeliveryVehicle} instances to store.
      */
 	public void load(DeliveryVehicle[] vehicles) {
-		collection=vehicles;
+		for(int i=0;i<vehicles.length;i++){
+			try{
+				vehicleQueue.put(vehicles[i]);
+			}
+			catch(InterruptedException ex) {}
+		}
 	}
 
 }

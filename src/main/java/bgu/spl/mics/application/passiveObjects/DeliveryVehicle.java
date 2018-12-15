@@ -40,6 +40,9 @@ public class DeliveryVehicle {
      * @param distance	The distance from the store to the customer.
      */
 	public void deliver(String address, int distance) {
-		// TODO Implement this
+		//TODO:address?
+		try {
+			Thread.sleep(distance*speed);
+		} catch(InterruptedException ex) {}
 	}
 }
