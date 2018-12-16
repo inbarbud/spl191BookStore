@@ -51,16 +51,21 @@ public class Inventory {
      * 			second should reduce by one the number of books of the desired type.
      */
 	public OrderResult take (String book) {
+		BookInventoryInfo b=null;
 		for (BookInventoryInfo element: collection) {
-			if(element.getBookTitle()==book && element.getAmountInInventory()>0) {
-				element.minusAmountInInventory();
-				return OrderResult.SUCCESSFULLY_TAKEN;
+			if (element.getBookTitle() == book)
+				b = element;
+		}
+		if(b!=null) {
+			synchronized (b) {
+				if (b.getAmountInInventory() > 0) {
+					b.minusAmountInInventory();
+					return OrderResult.SUCCESSFULLY_TAKEN;
+				}
 			}
 		}
 		return OrderResult.NOT_IN_STOCK;
 	}
-	
-	
 	
 	/**
      * Checks if a certain book is available in the inventory.
@@ -69,9 +74,14 @@ public class Inventory {
      * @return the price of the book if it is available, -1 otherwise.
      */
 	public int checkAvailabiltyAndGetPrice(String book) {
+		BookInventoryInfo b=null;
 		for (BookInventoryInfo element: collection) {
-			if(element.getBookTitle()==book && element.getAmountInInventory()>0) {
-				return element.getPrice();
+			if (element.getBookTitle() == book)
+				b = element;
+		}
+		if(b!=null) {
+			if (b.getAmountInInventory() > 0) {
+				return b.getPrice();
 			}
 		}
 		return -1;

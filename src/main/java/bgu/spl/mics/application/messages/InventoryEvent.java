@@ -10,10 +10,12 @@ public class InventoryEvent implements Event<Integer> {
 
     int availableAmount;
     String bookTitle;
+    Customer customer;
 
-    public InventoryEvent(String bookTitle, int AvailableCreditAmount){
+    public InventoryEvent(String bookTitle, int AvailableCreditAmount, Customer customer){
         this.bookTitle=bookTitle;
         this.availableAmount=AvailableCreditAmount;
+        this.customer=customer;
     }
 
     public String getBookName(){
@@ -24,4 +26,7 @@ public class InventoryEvent implements Event<Integer> {
         return availableAmount;
     }
 
+    public Customer getCustomer() {
+        return customer;
+    }
 }

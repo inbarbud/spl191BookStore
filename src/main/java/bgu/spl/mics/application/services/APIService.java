@@ -11,6 +11,10 @@ import bgu.spl.mics.application.passiveObjects.ResourcesHolder;
 import bgu.spl.mics.application.passiveObjects.MoneyRegister;
 import javafx.util.Pair;
 import bgu.spl.mics.application.passiveObjects.Customer;
+
+import java.util.Comparator;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -24,40 +28,52 @@ import java.util.concurrent.TimeUnit;
  */
 public class APIService extends MicroService{
 
-	private Pair <String,Integer>[] orderSchedule;			//name,Tick
 	private Customer orderingCustomer;
-	int currentTime;
+	//int currentTime;
+	private PriorityBlockingQueue<Future<OrderReceipt>> futureQueue;
 
-	public APIService(int serviceNumber,Customer orderingCustomer, Pair <String,Integer>[] orderSchedule) {
+	public APIService(int serviceNumber,Customer orderingCustomer) {
 		super("APIService" + serviceNumber);
-		this.orderSchedule=orderSchedule;
 		this.orderingCustomer=orderingCustomer;
+		this.futureQueue= new PriorityBlockingQueue<>(100,(b1,b2)->{
+			if(b1.isDone())
+				return -1;
+			if(b2.isDone())
+				return 1;
+			return 0;
+		});
 	}
 
 	@Override
 	protected void initialize() {
 		// TODO Implement this
 		subscribeBroadcast(TickBroadcast.class, br -> {
-			currentTime = br.getTime();
+			while(br.getTime()==orderingCustomer.getOrderSchedule().peek().getValue())
+			{
+				try{
+					BookOrderEvent ev= new BookOrderEvent(orderingCustomer, orderingCustomer.getOrderSchedule().take());
+					Future<OrderReceipt> result = sendEvent(ev);
+					futureQueue.add(result);
+				}
+				catch (InterruptedException e){}
+			}
+			while (futureQueue.peek().isDone()) {
+				try {
+					Future<OrderReceipt> result = futureQueue.take();
+					if (result != null) {
+						OrderReceipt receipt = result.get();
+						if (receipt != null)
+							orderingCustomer.addReceipt(receipt);
+							DeliveryEvent ev2 = new DeliveryEvent(orderingCustomer);
+							sendEvent(ev2);
+						}
+
+				} catch (InterruptedException e) {}
+			}
+
 			terminate();
 		});
-
-		for(int i=0;i<orderSchedule.length;i++) {
-			BookOrderEvent ev= new BookOrderEvent(orderingCustomer, orderSchedule[i]);
-			Future<OrderReceipt> result = sendEvent(ev);
-			if (result != null) {
-				OrderReceipt receipt = result.get(100, TimeUnit.MILLISECONDS);		//TODO: repair order by tick times
-				if(receipt==null)
-					complete(ev,null);
-				else {
-					complete(ev, receipt);
-					DeliveryEvent ev2= new DeliveryEvent(orderingCustomer, orderSchedule[i]);
-
-				}
-			}
 		}
 
 
 	}
-
-}

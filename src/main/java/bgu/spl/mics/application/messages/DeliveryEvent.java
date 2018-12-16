@@ -6,11 +6,9 @@ import javafx.util.Pair;
 public class DeliveryEvent implements Event<String> {
 
     private Customer customer;
-    private Pair<String,Integer> order;
 
-    public DeliveryEvent(Customer customer, Pair<String,Integer> order){
+    public DeliveryEvent(Customer customer){
         this.customer=customer;
-        this.order=order;
     }
 
     public Customer getCustomer(){

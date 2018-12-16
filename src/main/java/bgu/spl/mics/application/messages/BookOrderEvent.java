@@ -8,6 +8,7 @@ public class BookOrderEvent implements Event<OrderReceipt> {
 
     Customer orderingCustomer;
     Pair <String,Integer> book;
+    int processTick;
 
     public BookOrderEvent(Customer customer, Pair<String,Integer> book){
         this.book=book;
@@ -26,4 +27,10 @@ public class BookOrderEvent implements Event<OrderReceipt> {
         return book.getValue();
     }
 
+    public void setProcessTick(int tick){
+        processTick=tick;
+    }
+    public int getProcessTick(){
+        return processTick;
+    }
 }

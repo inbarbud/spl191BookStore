@@ -33,10 +33,13 @@ public class InventoryService extends MicroService{
 			int price= Inventory.getInstance().checkAvailabiltyAndGetPrice(ev.getBookName());
 			boolean taken=false;
 			if(price!=-1){			//book in stock
-				if(ev.getAvailableAmount()>=price) {		//want to take the book
-					if(Inventory.getInstance().take(ev.getBookName())== OrderResult.SUCCESSFULLY_TAKEN){
-						complete(ev,price);
-						taken=true;
+				synchronized (ev.getCustomer()) {
+					if (ev.getAvailableAmount() >= price) {        //want to take the book
+						if (Inventory.getInstance().take(ev.getBookName()) == OrderResult.SUCCESSFULLY_TAKEN) {
+							ev.getCustomer().setAvailableAmountInCreditCard(price);
+							complete(ev, price);
+							taken = true;
+						}
 					}
 				}
 			}

@@ -1,6 +1,12 @@
 package bgu.spl.mics.application.passiveObjects;
 
 import java.util.List;
+import javafx.util.Pair;
+
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.Comparator;
+
 
 /**
  * Passive data-object representing a customer of the store.
@@ -17,8 +23,11 @@ public class Customer {
 	private List<OrderReceipt> Receipts;
 	private int creditCard;
 	private int availableAmountInCreditCard;
+	private PriorityBlockingQueue<Pair<String,Integer>> orderSchedule;
+	//BlockingQueue b=new PriorityBlockingQueue<Pair<String,Integer>>(100, Comparator.comparingInt(Pair::getValue));    parser
 
-	public Customer(int id, String name, String address, int distance, List<OrderReceipt> Receipts, int creditCard, int availableAmountInCreditCard){
+
+	public Customer(int id, String name, String address, int distance, List<OrderReceipt> Receipts, int creditCard, int availableAmountInCreditCard, PriorityBlockingQueue<Pair<String,Integer>> orderSchedule){
 		this.id=id;
 		this.name=name;
 		this.address=address;
@@ -26,6 +35,7 @@ public class Customer {
 		this.Receipts=Receipts;
 		this.creditCard=creditCard;
 		this.availableAmountInCreditCard=availableAmountInCreditCard;
+		this.orderSchedule= orderSchedule;
 	}
 
 	/**
@@ -85,5 +95,12 @@ public class Customer {
 	public int getCreditNumber() {
 		return creditCard;
 	}
-	
+
+	public PriorityBlockingQueue<Pair<String,Integer>> getOrderSchedule(){
+		return orderSchedule;
+	}
+
+	public void addReceipt(OrderReceipt r){
+		Receipts.add(r);
+	}
 }
